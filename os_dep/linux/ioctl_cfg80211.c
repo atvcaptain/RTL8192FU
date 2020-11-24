@@ -3331,9 +3331,11 @@ static int rtw_cfg80211_set_auth_type(struct security_priv *psecuritypriv,
 
 
 		break;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
 	case NL80211_AUTHTYPE_SAE:
 		psecuritypriv->auth_alg = WLAN_AUTH_SAE;
 		break;
+#endif
 	default:
 		psecuritypriv->dot11AuthAlgrthm = dot11AuthAlgrthm_Open;
 		/* return -ENOTSUPP; */
@@ -3855,10 +3857,12 @@ static int cfg80211_rtw_connect(struct wiphy *wiphy, struct net_device *ndev,
 	RTW_INFO("privacy=%d, key=%p, key_len=%d, key_idx=%d, auth_type=%d\n",
 		sme->privacy, sme->key, sme->key_len, sme->key_idx, sme->auth_type);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
 	if (rtw_check_connect_sae_compat(sme)) {
 		sme->auth_type = NL80211_AUTHTYPE_SAE;
 		RTW_INFO("%s set sme->auth_type=4 for SAE compat\n", __FUNCTION__);
 	}
+#endif
 
 	if (pwdev_priv->block == _TRUE) {
 		ret = -EBUSY;
@@ -4234,6 +4238,7 @@ static void _rtw_set_pmksa(struct net_device *ndev,
 	}
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
 static int cfg80211_rtw_set_pmksa(struct wiphy *wiphy,
 				  struct net_device *ndev,
 				  struct cfg80211_pmksa *pmksa)
@@ -4312,6 +4317,7 @@ static int cfg80211_rtw_flush_pmksa(struct wiphy *wiphy,
 
 	return 0;
 }
+#endif
 
 #ifdef CONFIG_AP_MODE
 void rtw_cfg80211_indicate_sta_assoc(_adapter *padapter, u8 *pmgmt_frame, uint frame_len)
@@ -9850,9 +9856,11 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
 	.set_tx_power = cfg80211_rtw_set_txpower,
 	.get_tx_power = cfg80211_rtw_get_txpower,
 	.set_power_mgmt = cfg80211_rtw_set_power_mgmt,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
 	.set_pmksa = cfg80211_rtw_set_pmksa,
 	.del_pmksa = cfg80211_rtw_del_pmksa,
 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+#endif
 
 #ifdef CONFIG_AP_MODE
 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
